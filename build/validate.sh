@@ -108,7 +108,7 @@ function checkWithLatestDemoShop {
 
 function checkModuleWithLatestVersionOfDemoShop {
     echo "Merging composer.json dependencies..."
-    updates=`php "$TRAVIS_BUILD_DIR/$MODULE_DIR/build/merge-composer.php" "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json" composer.json "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json"`
+    updates=`php "$TRAVIS_BUILD_DIR/ecoci/build/merge-composer.php" "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json" composer.json "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json"`
     if [ "$updates" = "" ]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Demo Shop"
         return

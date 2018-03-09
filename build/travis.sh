@@ -17,6 +17,6 @@ cp config/Shared/ci/travis/config_ci.php config/Shared/config_default-devtest_DE
 cp config/Shared/ci/travis/params_test_env.sh deploy/setup/params_test_env.sh
 cd ..
 
-chmod a+x ./$MODULE_DIR/build/travis.sh
+chmod a+x ./ecoci/build/travis.sh
 
-./$MODULE_DIR/build/validate.sh
+./ecoci/build/validate.sh
