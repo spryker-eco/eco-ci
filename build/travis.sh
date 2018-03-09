@@ -1,7 +1,7 @@
 echo "Moving module to subfolder..."
 if [[ *$TRAVIS_EVENT_TYPE* = 'cron' ]]; then git checkout $(git tag | tail -n 1); fi
 mkdir $MODULE_DIR
-ls -1 | grep -v ^$MODULE_DIR | xargs -I{} mv {} $MODULE_DIR
+ls -1 | grep -v ^$MODULE_DIR | grep -v ^ecoci | xargs -I{} mv {} $MODULE_DIR
 
 echo "Cloning Demo Shop..."
 git clone https://github.com/spryker/demoshop.git $SHOP_DIR
