@@ -1,5 +1,6 @@
 echo "Version of CI scripts:"
 cd ecoci
+git pull
 git log | head -1
 cd ..
 
