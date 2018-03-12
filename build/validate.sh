@@ -116,18 +116,6 @@ function checkLatestVersionOfModuleWithDemoShop {
     echo "Installing module with updated dependencies..."
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
 
-
-    pwd
-    echo "ls $TRAVIS_BUILD_DIR/$MODULE_DIR"
-    ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    echo " ls $TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/spryker-eco"
-    ls -la "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/spryker-eco"
-    echo " ls $TRAVIS_BUILD_DIR/$SHOP_DIR/vendor"
-    ls -la "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor"
-    echo " ls $TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/$MODULE_NAME"
-    ls -la "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/$MODULE_NAME"
-    return 0
-
     result=$?
     if [ "$result" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Demo Shop"
