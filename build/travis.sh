@@ -1,3 +1,8 @@
+echo "Version of CI scripts:"
+cd ecoci
+git log | head -1
+cd ..
+
 echo "Moving module to subfolder..."
 if [[ *$TRAVIS_EVENT_TYPE* = 'cron' ]]; then git checkout $(git tag | tail -n 1); fi
 mkdir $MODULE_DIR
