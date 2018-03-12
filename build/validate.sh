@@ -73,8 +73,6 @@ function checkCodeSniffRules {
 }
 
 function checkPHPStan {
-    echo "Installing PHPStan..."
-    composer require --dev phpstan/phpstan
     echo "Updating code-completition..."
     vendor/bin/console dev:ide:generate-auto-completion
     echo "Running PHPStan..."
@@ -94,6 +92,13 @@ function checkWithLatestDemoShop {
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
     result=$?
+
+    echo "ls $TRAVIS_BUILD_DIR/payolution/module"
+    ls -la "$TRAVIS_BUILD_DIR/payolution/module"
+    echo " ls $TRAVIS_BUILD_DIR/$MODULE_DIR/vendor/spryker-eco/$MODULE_NAME"
+    ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR/vendor/spryker-eco/$MODULE_NAME"
+
+    return 0
     if [ "$result" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in Demo Shop"
         if runTests; then
@@ -115,7 +120,7 @@ function checkModuleWithLatestVersionOfDemoShop {
     fi
     buildMessage="${buildMessage}\nUpdated dependencies in module to match Demo Shop\n$updates"
     echo "Installing module with updated dependencies..."
-    composer require "spryker-eco/$MODULE_NAME @dev"
+    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
     result=$?
     if [ "$result" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Demo Shop"
