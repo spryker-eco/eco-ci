@@ -61,7 +61,7 @@ function checkCodeSniffRules {
     fi
 
     echo "Running code sniffer..."
-    errors=`vendor/bin/console code:sniff "vendor/spryker-eco/$MODULE_NAME/src"`
+    errors=`vendor/bin/console code:sniff:style "vendor/spryker-eco/$MODULE_NAME/src"`
     errorsPresent=$?
 
     if [[ "$errorsPresent" = "0" ]]; then
@@ -79,9 +79,9 @@ function checkPHPStan {
     vendor/bin/console dev:ide:generate-auto-completion
     echo "Running PHPStan..."
     errors=`php -d memory_limit=2048M vendor/bin/phpstan analyze -c phpstan.neon "vendor/spryker-eco/$MODULE_NAME/src" -l 2`
+    errorsPresent=$?
 
-    errorsCount=`echo "$errors" | wc -l`
-    if [[ "$errorsCount" = "0" ]]; then
+    if [[ "errorsPresent" = "0" ]]; then
         buildMessage="$buildMessage\n${GREEN}PHPStan reports no errors"
     else
         echo -e "$errors"
@@ -92,7 +92,7 @@ function checkPHPStan {
 function checkWithLatestDemoShop {
     echo "Checking module with latest Demo Shop..."
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    composer require "spryker-eco/$MODULE_NAME @dev"
+    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
     result=$?
     if [ "$result" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in Demo Shop"
