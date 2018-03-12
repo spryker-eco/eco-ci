@@ -120,8 +120,10 @@ function checkLatestVersionOfModuleWithDemoShop {
     pwd
     echo "ls $TRAVIS_BUILD_DIR/$MODULE_DIR"
     ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    echo " ls $TRAVIS_BUILD_DIR/$MODULE_DIR/vendor/spryker-eco/$MODULE_NAME"
-    ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR/vendor/spryker-eco/$MODULE_NAME"
+    echo " ls $TRAVIS_BUILD_DIR/$MODULE_DIR/vendor/spryker-eco"
+    ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR/vendor/spryker-eco"
+    echo " ls $TRAVIS_BUILD_DIR/$MODULE_DIR/vendor"
+    ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR/vendor"
     return 0
 
     result=$?
