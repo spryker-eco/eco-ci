@@ -79,7 +79,7 @@ function checkPHPStan {
     errors=`php -d memory_limit=2048M vendor/bin/phpstan analyze -c phpstan.neon "vendor/spryker-eco/$MODULE_NAME/src" -l 2`
     errorsPresent=$?
 
-    if [[ "errorsPresent" = "0" ]]; then
+    if [[ "$errorsPresent" = "0" ]]; then
         buildMessage="$buildMessage\n${GREEN}PHPStan reports no errors"
     else
         echo -e "$errors"
