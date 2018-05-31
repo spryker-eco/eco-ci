@@ -3,6 +3,8 @@ cd ecoci
 git log | head -1
 cd ..
 
+phpenv config-add ./ecoci/build/travis.php.ini
+
 echo "Moving module to subfolder..."
 if [[ *$TRAVIS_EVENT_TYPE* = 'cron' ]]; then git checkout $(git tag | tail -n 1); fi
 mkdir $MODULE_DIR
