@@ -7,6 +7,7 @@ buildMessage=""
 result=0
 
 function runTests {
+    echo "Generate transfers..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" transfer:generate
     if [ "$?" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}Transfer objects generation was successful"
@@ -15,6 +16,7 @@ function runTests {
         result=$((result+1))
     fi
 
+    echo "Install propel..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" propel:install
     if [ "$?" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}Propel models generation was successful"
@@ -24,7 +26,7 @@ function runTests {
     fi
 
     echo "Setup for tests..."
-    ./setup_test -f
+    install -r testing -x frontend
 
     echo "Running tests..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
