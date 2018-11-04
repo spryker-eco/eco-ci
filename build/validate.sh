@@ -135,11 +135,11 @@ function checkWithLatestShopSuite {
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in Shop Suite"
         if runTests; then
             buildResult=0
-            checkLatestVersionOfModuleWithDemoShop
+            checkLatestVersionOfModuleWithShopSuite
         fi
     else
         buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the modules used in Shop Suite"
-        checkLatestVersionOfModuleWithDemoShop
+        checkLatestVersionOfModuleWithShopSuite
     fi
 }
 
