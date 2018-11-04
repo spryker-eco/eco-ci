@@ -7,35 +7,14 @@ buildMessage=""
 result=0
 
 function runTests {
-    echo "Generate transfers..."
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" transfer:generate
-    if [ "$?" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}Transfer objects generation was successful"
-    else
-        buildMessage="${buildMessage}\n${RED}Transfer objects generation was not successful"
-        result=$((result+1))
-    fi
-
-    echo "Generate data builders..."
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" transfer:databuilder:generate
-    if [ "$?" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}Data builder objects generation was successful"
-    else
-        buildMessage="${buildMessage}\n${RED}Data builder objects generation was not successful"
-        result=$((result+1))
-    fi
-
-    echo "Install propel..."
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" propel:install
-    if [ "$?" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}Propel models generation was successful"
-    else
-        buildMessage="${buildMessage}\n${RED}Propel models generation was not successful"
-        result=$((result+1))
-    fi
-
     echo "Setup for tests..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/install" -r testing -x frontend
+    if [ "$?" = 0 ]; then
+        buildMessage="${buildMessage}\n${GREEN}Install for testing was successful"
+    else
+        buildMessage="${buildMessage}\n${RED}Install for testing was not successful"
+        result=$((result+1))
+    fi
 
     echo "Running tests..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
@@ -61,6 +40,7 @@ function checkArchRules {
         errorsCount=`echo "$errors" | wc -l`
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}Architecture sniffer reports $errorsCount error(s)"
+        result=$((result+1))
     fi
 }
 
@@ -80,12 +60,11 @@ function checkCodeSniffRules {
     else
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}Code sniffer reports some error(s)"
+        result=$((result+1))
     fi
 }
 
 function checkPHPStan {
-    echo "Updating code-completition..."
-    vendor/bin/console dev:ide:generate-auto-completion
     echo "Running PHPStan..."
     errors=`php -d memory_limit=2048M vendor/bin/phpstan analyze -c phpstan.neon "vendor/spryker-eco/$MODULE_NAME/src" -l 2`
     errorsPresent=$?
