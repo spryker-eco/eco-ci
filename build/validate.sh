@@ -9,11 +9,19 @@ result=0
 function runTests {
     echo "Generate transfers..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" transfer:generate
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" transfer:databuilder:generate
     if [ "$?" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}Transfer objects generation was successful"
     else
         buildMessage="${buildMessage}\n${RED}Transfer objects generation was not successful"
+        result=$((result+1))
+    fi
+
+    echo "Generate data builders..."
+    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" transfer:databuilder:generate
+    if [ "$?" = 0 ]; then
+        buildMessage="${buildMessage}\n${GREEN}Data builder objects generation was successful"
+    else
+        buildMessage="${buildMessage}\n${RED}Data builder objects generation was not successful"
         result=$((result+1))
     fi
 
