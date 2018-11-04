@@ -35,7 +35,7 @@ function runTests {
     fi
 
     echo "Setup for tests..."
-    install -r testing -x frontend
+    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/install" -r testing -x frontend
 
     echo "Running tests..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
