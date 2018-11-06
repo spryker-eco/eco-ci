@@ -10,8 +10,8 @@ if [[ *$TRAVIS_EVENT_TYPE* = 'cron' ]]; then git checkout $(git tag | tail -n 1)
 mkdir $MODULE_DIR
 ls -1 | grep -v ^$MODULE_DIR | grep -v ^ecoci | xargs -I{} mv {} $MODULE_DIR
 
-echo "Cloning Demo Shop..."
-git clone https://github.com/spryker/demoshop.git $SHOP_DIR
+echo "Cloning Shop Suite..."
+git clone https://github.com/spryker-shop/suite.git $SHOP_DIR
 cd $SHOP_DIR
 composer self-update && composer --version
 composer install --no-interaction

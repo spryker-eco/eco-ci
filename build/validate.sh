@@ -7,24 +7,14 @@ buildMessage=""
 result=0
 
 function runTests {
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" transfer:generate
-    if [ "$?" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}Transfer objects generation was successful"
-    else
-        buildMessage="${buildMessage}\n${RED}Transfer objects generation was not successful"
-        result=$((result+1))
-    fi
-
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/console" propel:install
-    if [ "$?" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}Propel models generation was successful"
-    else
-        buildMessage="${buildMessage}\n${RED}Propel models generation was not successful"
-        result=$((result+1))
-    fi
-
     echo "Setup for tests..."
-    ./setup_test -f
+    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/install" -r testing -x frontend
+    if [ "$?" = 0 ]; then
+        buildMessage="${buildMessage}\n${GREEN}Install for testing was successful"
+    else
+        buildMessage="${buildMessage}\n${RED}Install for testing was not successful"
+        result=$((result+1))
+    fi
 
     echo "Running tests..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
@@ -73,8 +63,6 @@ function checkCodeSniffRules {
 }
 
 function checkPHPStan {
-    echo "Updating code-completition..."
-    vendor/bin/console dev:ide:generate-auto-completion
     echo "Running PHPStan..."
     errors=`php -d memory_limit=2048M vendor/bin/phpstan analyze -c phpstan.neon "vendor/spryker-eco/$MODULE_NAME/src" -l 2`
     errorsPresent=$?
@@ -87,41 +75,41 @@ function checkPHPStan {
     fi
 }
 
-function checkWithLatestDemoShop {
-    echo "Checking module with latest Demo Shop..."
+function checkWithLatestShopSuite {
+    echo "Checking module with latest Shop Suite..."
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
     result=$?
 
     if [ "$result" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in Demo Shop"
+        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in Shop Suite"
         if runTests; then
             buildResult=0
-            checkLatestVersionOfModuleWithDemoShop
+            checkLatestVersionOfModuleWithShopSuite
         fi
     else
-        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the modules used in Demo Shop"
-        checkLatestVersionOfModuleWithDemoShop
+        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the modules used in Shop Suite"
+        checkLatestVersionOfModuleWithShopSuite
     fi
 }
 
-function checkLatestVersionOfModuleWithDemoShop {
+function checkLatestVersionOfModuleWithShopSuite {
     echo "Merging composer.json dependencies..."
     updates=`php "$TRAVIS_BUILD_DIR/ecoci/build/merge-composer.php" "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json" composer.json "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json"`
     if [ "$updates" = "" ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Demo Shop"
+        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Shop Suite"
         return
     fi
-    buildMessage="${buildMessage}\nUpdated dependencies in module to match Demo Shop\n$updates"
+    buildMessage="${buildMessage}\nUpdated dependencies in module to match Shop Suite\n$updates"
     echo "Installing module with updated dependencies..."
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
 
     result=$?
     if [ "$result" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Demo Shop"
+        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Shop Suite"
         runTests
     else
-        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the latest version of modules used in Demo Shop"
+        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the latest version of modules used in Shop Suite"
     fi
 }
 
@@ -132,7 +120,7 @@ if [ $? = 1 ]; then
 fi
 
 cd $SHOP_DIR
-checkWithLatestDemoShop
+checkWithLatestShopSuite
 if [ -d "vendor/spryker-eco/$MODULE_NAME/src" ]; then
     checkArchRules
     checkCodeSniffRules
