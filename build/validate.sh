@@ -40,7 +40,6 @@ function checkArchRules {
         errorsCount=`echo "$errors" | wc -l`
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}Architecture sniffer reports $errorsCount error(s)"
-        result=$((result+1))
     fi
 }
 
@@ -60,7 +59,6 @@ function checkCodeSniffRules {
     else
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}Code sniffer reports some error(s)"
-        result=$((result+1))
     fi
 }
 
