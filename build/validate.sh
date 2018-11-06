@@ -77,44 +77,6 @@ function checkPHPStan {
     fi
 }
 
-function checkWithLatestDemoShop {
-    echo "Checking module with latest Demo Shop..."
-    composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
-    result=$?
-
-    if [ "$result" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in Demo Shop"
-        if runTests; then
-            buildResult=0
-            checkLatestVersionOfModuleWithDemoShop
-        fi
-    else
-        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the modules used in Demo Shop"
-        checkLatestVersionOfModuleWithDemoShop
-    fi
-}
-
-function checkLatestVersionOfModuleWithDemoShop {
-    echo "Merging composer.json dependencies..."
-    updates=`php "$TRAVIS_BUILD_DIR/ecoci/build/merge-composer.php" "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json" composer.json "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json"`
-    if [ "$updates" = "" ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Demo Shop"
-        return
-    fi
-    buildMessage="${buildMessage}\nUpdated dependencies in module to match Demo Shop\n$updates"
-    echo "Installing module with updated dependencies..."
-    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
-
-    result=$?
-    if [ "$result" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Demo Shop"
-        runTests
-    else
-        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the latest version of modules used in Demo Shop"
-    fi
-}
-
 function checkWithLatestShopSuite {
     echo "Checking module with latest Shop Suite..."
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
