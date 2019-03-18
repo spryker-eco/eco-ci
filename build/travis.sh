@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo "Version of CI scripts:"
 cd ecoci
 git log | head -1
@@ -10,11 +12,14 @@ if [[ *$TRAVIS_EVENT_TYPE* = 'cron' ]]; then git checkout $(git tag | tail -n 1)
 mkdir $MODULE_DIR
 ls -1 | grep -v ^$MODULE_DIR | grep -v ^ecoci | xargs -I{} mv {} $MODULE_DIR
 
-echo "Cloning Shop Suite..."
-git clone https://github.com/spryker-shop/suite.git $SHOP_DIR
+echo "Cloning $PRODUCT_NAME..."
+git clone https://github.com/spryker-shop/$PRODUCT_NAME.git $SHOP_DIR
 cd $SHOP_DIR
+
+composer global require hirak/prestissimo
 composer self-update && composer --version
 composer install --no-interaction
+
 mkdir -p data/DE/logs
 chmod -R 777 data/
 ./config/Shared/ci/travis/install_elasticsearch.sh
