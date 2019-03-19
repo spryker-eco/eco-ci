@@ -9,6 +9,7 @@ result=0
 function runTests {
     echo "Setup for tests..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/install" -r testing -x frontend
+
     if [ "$?" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}Install for testing was successful"
     else
@@ -19,7 +20,7 @@ function runTests {
     echo "Running tests..."
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" run -c "vendor/spryker-eco/$MODULE_NAME/"
-    if [ "$?" = 0 ]; then
+    if [[ "$?" = 0 ]]; then
         buildMessage="${buildMessage}\n${GREEN}Tests are passing"
     else
         buildMessage="${buildMessage}\n${RED}Tests are failing"
@@ -27,6 +28,7 @@ function runTests {
     fi
     cd "$TRAVIS_BUILD_DIR/$SHOP_DIR"
     echo "Tests finished"
+
     return $result
 }
 
@@ -45,7 +47,7 @@ function checkArchRules {
 
 function checkCodeSniffRules {
     licenseFile="$TRAVIS_BUILD_DIR/.license"
-    if [ -f "$licenseFile" ]; then
+    if [[ -f "$licenseFile" ]]; then
         echo "Preparing correct license for code sniffer..."
         cp "$licenseFile" "$TRAVIS_BUILD_DIR/$SHOP_DIR/.license"
     fi
@@ -75,56 +77,76 @@ function checkPHPStan {
     fi
 }
 
-function checkWithLatestShopSuite {
-    echo "Checking module with latest Shop Suite..."
-    composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
-    result=$?
+function checkDependencyViolationFinder {
+    echo "Running DependencyViolationFinder"
+    errors=`vendor/bin/console dev:dependency:find "SprykerEco.$MODULE_NAME" -vvv`
+    errorsPresent=$?
 
-    if [ "$result" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in Shop Suite"
-        if runTests; then
-            buildResult=0
-            checkLatestVersionOfModuleWithShopSuite
-        fi
+    if [[ "$errorsPresent" = "0" ]]; then
+        buildMessage="$buildMessage\n${GREEN}DependencyViolationFinder reports no errors"
     else
-        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the modules used in Shop Suite"
-        checkLatestVersionOfModuleWithShopSuite
+        echo -e "$errors"
+        buildMessage="$buildMessage\n${RED}DependencyViolationFinder reports some error(s)"
     fi
 }
 
-function checkLatestVersionOfModuleWithShopSuite {
+function checkWithLatestShop {
+    echo "Checking module with latest $PRODUCT_NAME..."
+
+    composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
+    composer update --with-all-dependencies
+    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
+    result=$?
+
+    if [[ "$result" = 0 ]]; then
+        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in $PRODUCT_NAME"
+        if runTests; then
+            buildResult=0
+            checkLatestVersionOfModuleWithShop
+        fi
+    else
+        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the modules used in $PRODUCT_NAME"
+        checkLatestVersionOfModuleWithShop
+    fi
+}
+
+function checkLatestVersionOfModuleWithShop {
     echo "Merging composer.json dependencies..."
     updates=`php "$TRAVIS_BUILD_DIR/ecoci/build/merge-composer.php" "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json" composer.json "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json"`
-    if [ "$updates" = "" ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Shop Suite"
+    if [[ "$updates" = "" ]]; then
+        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in $PRODUCT_NAME"
         return
     fi
-    buildMessage="${buildMessage}\nUpdated dependencies in module to match Shop Suite\n$updates"
+
+    buildMessage="${buildMessage}\nUpdated dependencies in module to match $PRODUCT_NAME\n$updates"
     echo "Installing module with updated dependencies..."
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
 
     result=$?
-    if [ "$result" = 0 ]; then
-        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in Shop Suite"
+    if [[ "$result" = 0 ]]; then
+        buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in $PRODUCT_NAME"
         runTests
     else
-        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the latest version of modules used in Shop Suite"
+        buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the latest version of modules used in $PRODUCT_NAME"
     fi
 }
 
 updatedFile="$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/codeception/codeception/src/Codeception/Application.php"
 grep APPLICATION_ROOT_DIR "$updatedFile"
-if [ $? = 1 ]; then
+if [[ $? = 1 ]]; then
     echo "define('APPLICATION_ROOT_DIR', '$TRAVIS_BUILD_DIR/$SHOP_DIR');" >> "$updatedFile"
 fi
 
 cd $SHOP_DIR
-checkWithLatestShopSuite
-if [ -d "vendor/spryker-eco/$MODULE_NAME/src" ]; then
+checkWithLatestShop
+
+if [[ -d "vendor/spryker-eco/$MODULE_NAME/src" ]]; then
     checkArchRules
     checkCodeSniffRules
     checkPHPStan
+
+    # will be added:
+    #checkDependencyViolationFinder
 fi
 
 echo -e "$buildMessage"
