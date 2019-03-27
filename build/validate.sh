@@ -106,7 +106,6 @@ function checkWithLatestShop {
         fi
     else
         buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the modules used in $PRODUCT_NAME"
-        checkLatestVersionOfModuleWithShop
     fi
 }
 
@@ -125,7 +124,6 @@ function checkLatestVersionOfModuleWithShop {
     result=$?
     if [[ "$result" = 0 ]]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in $PRODUCT_NAME"
-        runTests
     else
         buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the latest version of modules used in $PRODUCT_NAME"
     fi
