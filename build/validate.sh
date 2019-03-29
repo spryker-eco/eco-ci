@@ -144,8 +144,8 @@ if [[ -d "vendor/spryker-eco/$MODULE_NAME/src" ]]; then
     checkCodeSniffRules
     checkPHPStan
 
-    # will be added:
-    checkDependencyViolationFinder
+    # dev:dependency:find command is not present in spryker-shop/suite
+    # checkDependencyViolationFinder
 fi
 
 echo -e "$buildMessage"
