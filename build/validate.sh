@@ -79,7 +79,8 @@ function checkPHPStan {
 
 function checkDependencyViolationFinder {
     echo "Running DependencyViolationFinder"
-    errors=`vendor/bin/console dev:dependency:find "SprykerEco.$MODULE_NAME" -vvv`
+    module=$MODULE_NAME | sed -r 's/(^|-)([a-z])/\U\2/g'
+    errors=`vendor/bin/console dev:dependency:find "SprykerEco.$module" -vvv`
     errorsPresent=$?
 
     if [[ "$errorsPresent" = "0" ]]; then
@@ -144,7 +145,7 @@ if [[ -d "vendor/spryker-eco/$MODULE_NAME/src" ]]; then
     checkPHPStan
 
     # will be added:
-    #checkDependencyViolationFinder
+    checkDependencyViolationFinder
 fi
 
 echo -e "$buildMessage"
