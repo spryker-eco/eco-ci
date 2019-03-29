@@ -79,7 +79,7 @@ function checkPHPStan {
 
 function checkDependencyViolationFinder {
     echo "Running DependencyViolationFinder"
-    module=$MODULE_NAME | sed -r 's/(^|-)([a-z])/\U\2/g'
+    module=$(echo "$MODULE_NAME" | sed -r 's/(^|-)([a-z])/\U\2/g')
     errors=`vendor/bin/console dev:dependency:find "SprykerEco.$module" -vvv`
     errorsPresent=$?
 
