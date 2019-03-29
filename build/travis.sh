@@ -18,6 +18,7 @@ cd $SHOP_DIR
 
 composer global require hirak/prestissimo
 composer self-update && composer --version
+composer require nette/di:3.0
 composer install --no-interaction
 
 mkdir -p data/DE/logs
