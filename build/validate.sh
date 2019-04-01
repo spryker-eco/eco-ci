@@ -102,7 +102,7 @@ function checkWithLatestShop {
 
     echo "Installing module with updated dependencies..."
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    composer update --with-all-dependencies
+    composer update spryker*/*
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
 
     result=$?
