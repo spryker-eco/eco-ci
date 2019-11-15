@@ -96,6 +96,8 @@ function checkWithLatestShop {
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
     composer update --with-all-dependencies
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
+    # temporary til the product releas
+    composer require "spryker/web-profiler @dev" --prefer-source
     result=$?
 
     if [[ "$result" = 0 ]]; then
