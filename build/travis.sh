@@ -22,6 +22,8 @@ composer install --no-interaction
 
 mkdir -p data/DE/logs
 chmod -R 777 data/
+chmod -R 660 config/Zed/dev_only_private.key
+chmod -R 660 config/Zed/dev_only_public.key
 ./config/Shared/ci/travis/install_elasticsearch.sh
 
 cat config/Shared/ci/travis/postgresql_ci.config >> config/Shared/ci/travis/config_ci.php
