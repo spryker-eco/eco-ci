@@ -8,7 +8,7 @@ result=0
 
 function runTests {
     echo "Setup for tests..."
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/install" -r testing -x frontend
+    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/install" -r testing -x frontend -v
 
     if [ "$?" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}Install for testing was successful"

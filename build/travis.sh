@@ -18,16 +18,24 @@ cd $SHOP_DIR
 
 composer global require hirak/prestissimo
 composer self-update && composer --version
-composer install --no-interaction
+composer install --optimize-autoloader --no-interaction
 
+nvm install 8
+
+mkdir -p shared/data/common/jenkins
+mkdir -p shared/data/common/jenkins/jobs
+mkdir -p data/DE/cache/Yves/twig -m 0777
+mkdir -p data/DE/cache/Zed/twig -m 0777
 mkdir -p data/DE/logs
 chmod -R 777 data/
 chmod -R 660 config/Zed/dev_only_private.key
 chmod -R 660 config/Zed/dev_only_public.key
+chmod -R a+x config/Shared/ci/travis/
 ./config/Shared/ci/travis/install_elasticsearch.sh
+./config/Shared/ci/travis/install_mailcatcher.sh
 
 cat config/Shared/ci/travis/postgresql_ci.config >> config/Shared/ci/travis/config_ci.php
-cp config/Shared/ci/travis/config_ci.php config/Shared/config_default-devtest_DE.php
+cp config/Shared/ci/travis/config_ci.php config/Shared/config_local.php
 cp config/Shared/ci/travis/params_test_env.sh deploy/setup/params_test_env.sh
 cd ..
 
