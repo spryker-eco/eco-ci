@@ -18,6 +18,8 @@ function runTests {
     fi
 
     echo "Running tests..."
+    echo "Env is $APPLICATION_ENV"
+    echo "Postgres port $POSTGRES_PORT"
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" run -c "vendor/spryker-eco/$MODULE_NAME/"
     if [[ "$?" = 0 ]]; then
