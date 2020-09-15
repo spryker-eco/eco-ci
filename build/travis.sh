@@ -19,6 +19,7 @@ cd $SHOP_DIR
 composer global require hirak/prestissimo
 composer self-update && composer --version
 composer install --optimize-autoloader --no-interaction
+composer require "ruflin/elastica:6.*" --update-with-dependencies --optimize-autoloader --no-interaction
 
 nvm install 8
 
