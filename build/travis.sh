@@ -24,6 +24,9 @@ composer global require hirak/prestissimo
 composer self-update && composer --version
 composer install --optimize-autoloader --no-interaction
 
+pwd
+echo "shop dir is $SHOP_DIR"
+
 nvm install 12
 
 mkdir -p shared/data/common/jenkins
