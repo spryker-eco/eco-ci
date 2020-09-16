@@ -19,6 +19,7 @@ cd $SHOP_DIR
 composer global require hirak/prestissimo
 composer self-update && composer --version
 composer install --optimize-autoloader --no-interaction
+composer require "ruflin/elastica:6.*" "spryker/elastica:5.*" --update-with-dependencies --optimize-autoloader --no-interaction
 
 nvm install 8
 
@@ -31,12 +32,10 @@ chmod -R 777 data/
 chmod -R 660 config/Zed/dev_only_private.key
 chmod -R 660 config/Zed/dev_only_public.key
 chmod -R a+x config/Shared/ci/travis/
-./config/Shared/ci/travis/install_elasticsearch.sh
+./config/Shared/ci/travis/install_elasticsearch_6_8.sh
 ./config/Shared/ci/travis/install_mailcatcher.sh
+./config/Shared/ci/travis/configure_postgres.sh
 
-cat config/Shared/ci/travis/postgresql_ci.config >> config/Shared/ci/travis/config_ci.php
-cp config/Shared/ci/travis/config_ci.php config/Shared/config_local.php
-cp config/Shared/ci/travis/params_test_env.sh deploy/setup/params_test_env.sh
 cd ..
 
 chmod a+x ./ecoci/build/travis.sh
