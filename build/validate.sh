@@ -100,6 +100,7 @@ function checkWithLatestShop {
     composer require "spryker/web-profiler @dev" --prefer-source
     result=$?
 
+    ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR"
     cat composer.json | grep payone
     cat composer.lock | grep payone
 
