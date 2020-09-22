@@ -18,7 +18,6 @@ function runTests {
     fi
 
     echo "Running tests..."
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" bootstrap
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
     "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" run -c "vendor/spryker-eco/$MODULE_NAME/"
     if [[ "$?" = 0 ]]; then
@@ -100,6 +99,9 @@ function checkWithLatestShop {
     # temporary til the product releas
     composer require "spryker/web-profiler @dev" --prefer-source
     result=$?
+
+    cat composer.json | grep payone
+    cat composer.lock | grep payone
 
     if [[ "$result" = 0 ]]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in $PRODUCT_NAME"
