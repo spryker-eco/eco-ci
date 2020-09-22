@@ -93,11 +93,14 @@ function checkDependencyViolationFinder {
 function checkWithLatestShop {
     echo "Checking module with latest $PRODUCT_NAME..."
 
+    if composer show | grep -q "spryker-eco/$MODULE_NAME"; then
+      composer remove "spryker-eco/$MODULE_NAME"
+    fi
+
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
     composer update --with-all-dependencies
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
-    # temporary til the product releas
-    composer require "spryker/web-profiler @dev" --prefer-source
+
     result=$?
 
     if [[ "$result" = 0 ]]; then
