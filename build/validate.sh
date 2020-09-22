@@ -95,14 +95,15 @@ function checkWithLatestShop {
 
     composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
     composer update --with-all-dependencies
+
+    if composer show | grep "spryker-eco/$MODULE_NAME"; then
+      composer remove "spryker-eco/$MODULE_NAME"
+    fi
+
     composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
     # temporary til the product releas
     composer require "spryker/web-profiler @dev" --prefer-source
     result=$?
-
-    ls -la "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    cat composer.json | grep payone
-    cat composer.lock | grep payone
 
     if [[ "$result" = 0 ]]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the modules used in $PRODUCT_NAME"
