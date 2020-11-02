@@ -16,7 +16,6 @@ echo "Cloning $PRODUCT_NAME..."
 git clone https://github.com/spryker-shop/$PRODUCT_NAME.git $SHOP_DIR
 cd $SHOP_DIR
 
-composer global require hirak/prestissimo
 composer self-update && composer --version
 composer install --optimize-autoloader --no-interaction
 composer require "ruflin/elastica:6.*" "spryker/elastica:5.*" --update-with-dependencies --optimize-autoloader --no-interaction
