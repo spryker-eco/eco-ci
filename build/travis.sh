@@ -36,6 +36,7 @@ chmod -R a+x config/Shared/ci/travis/
 
 cd ..
 
+chmod a+x ./ecoci/build/configure_postgres.sh
 ./ecoci/build/configure_postgres.sh
 
 chmod a+x ./ecoci/build/travis.sh
