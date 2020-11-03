@@ -33,9 +33,11 @@ chmod -R 660 config/Zed/dev_only_public.key
 chmod -R a+x config/Shared/ci/travis/
 ./config/Shared/ci/travis/install_elasticsearch_6_8.sh
 ./config/Shared/ci/travis/install_mailcatcher.sh
-./config/Shared/ci/travis/configure_postgres.sh
 
 cd ..
+
+chmod a+x ./ecoci/build/configure_postgres.sh
+./ecoci/build/configure_postgres.sh
 
 chmod a+x ./ecoci/build/travis.sh
 
