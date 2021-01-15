@@ -31,8 +31,25 @@ chmod -R 777 data/
 chmod -R 660 config/Zed/dev_only_private.key
 chmod -R 660 config/Zed/dev_only_public.key
 chmod -R a+x config/Shared/ci/travis/
-./config/Shared/ci/travis/install_elasticsearch_6_8.sh
-./config/Shared/ci/travis/install_mailcatcher.sh
+
+FILE_PATH_INSTALL_ELASTIC_SEARCH=./config/Shared/ci/travis/install_elasticsearch_6_8.sh
+
+if [ -f $FILE_PATH_INSTALL_ELASTIC_SEARCH ]; then
+  bash $FILE_PATH_INSTALL_ELASTIC_SEARCH
+else
+  mkdir /home/travis/elasticsearch
+  wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.4.tar.gz | tar xz --directory=/home/travis/elasticsearch --strip-components=1 > /dev/null
+  /home/travis/elasticsearch/bin/elasticsearch --daemonize
+fi
+
+FILE_PATH_INSTALL_MAILCATCHER=./config/Shared/ci/travis/install_mailcatcher.sh
+
+if [ -f $FILE_PATH_INSTALL_MAILCATCHER ]; then
+  bash $FILE_PATH_INSTALL_MAILCATCHER
+else
+  gem install mailcatcher --no-document > /dev/null
+  mailcatcher > /dev/null
+fi
 
 cd ..
 
