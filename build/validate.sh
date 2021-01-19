@@ -33,6 +33,8 @@ function runTests {
 }
 
 function checkArchRules {
+    composer require spryker/architecture-sniffer:dev-master --prefer-source --no-scripts
+
     echo "Running Architecture sniffer..."
     errors=`vendor/bin/phpmd "vendor/spryker-eco/$MODULE_NAME/src" text vendor/spryker/architecture-sniffer/src/ruleset.xml --minimumpriority=2 | grep -v __construct`
 
