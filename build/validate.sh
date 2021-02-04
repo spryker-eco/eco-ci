@@ -68,7 +68,13 @@ function checkCodeSniffRules {
 
 function checkPHPStan {
     echo "Running PHPStan..."
-    errors=`php -d memory_limit=2048M vendor/bin/phpstan analyze -c phpstan.neon "vendor/spryker-eco/$MODULE_NAME/src" -l 2`
+    FILE_PATH_MODULE_PHPSTAN_NEON="vendor/spryker-eco/$MODULE_NAME/phpstan.neon"
+    if [ -f $FILE_PATH_MODULE_PHPSTAN_NEON ]; then
+      FILE_PATH_PHPSTAN_NEON=$FILE_PATH_MODULE_PHPSTAN_NEON
+    else
+      FILE_PATH_PHPSTAN_NEON=phpstan.neon
+    fi
+    errors=`php -d memory_limit=2048M vendor/bin/phpstan analyze -c $FILE_PATH_PHPSTAN_NEON "vendor/spryker-eco/$MODULE_NAME/src" -l 2`
     errorsPresent=$?
 
     if [[ "$errorsPresent" = "0" ]]; then
