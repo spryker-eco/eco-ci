@@ -5,10 +5,20 @@ GREEN='\033[1;32m'
 buildResult=1
 buildMessage=""
 result=0
+composerPreference=$1
+
+if [ "$GITHUB_HEAD_REF" = "" ]; then
+  moduleVersion='@dev'
+else
+  moduleVersion="dev-$GITHUB_HEAD_REF"
+fi
+
+echo 'module version'
+echo $moduleVersion
 
 function runTests {
     echo "Setup for tests..."
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/install" DE -r ci -x frontend -x fixtures -v
+    "$GITHUB_WORKSPACE/$SHOP_DIR/vendor/bin/install" DE -r ci -x frontend -x fixtures -v
 
     if [ "$?" = 0 ]; then
         buildMessage="${buildMessage}\n${GREEN}Install for testing was successful"
@@ -18,15 +28,15 @@ function runTests {
     fi
 
     echo "Running tests..."
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
-    "$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/bin/codecept" run -c "vendor/spryker-eco/$MODULE_NAME/"
+    "$GITHUB_WORKSPACE/$SHOP_DIR/vendor/bin/codecept" build -c "vendor/spryker-eco/$MODULE_NAME/"
+    "$GITHUB_WORKSPACE/$SHOP_DIR/vendor/bin/codecept" run -c "vendor/spryker-eco/$MODULE_NAME/"
     if [[ "$?" = 0 ]]; then
         buildMessage="${buildMessage}\n${GREEN}Tests are passing"
     else
         buildMessage="${buildMessage}\n${RED}Tests are failing"
         result=$((result+1))
     fi
-    cd "$TRAVIS_BUILD_DIR/$SHOP_DIR"
+    cd "$GITHUB_WORKSPACE/$SHOP_DIR"
     echo "Tests finished"
 
     return $result
@@ -42,14 +52,15 @@ function checkArchRules {
         errorsCount=`echo "$errors" | wc -l`
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}Architecture sniffer reports $errorsCount error(s)"
+        buildResult=1
     fi
 }
 
 function checkCodeSniffRules {
-    licenseFile="$TRAVIS_BUILD_DIR/.license"
+    licenseFile="$GITHUB_WORKSPACE/.license"
     if [[ -f "$licenseFile" ]]; then
         echo "Preparing correct license for code sniffer..."
-        cp "$licenseFile" "$TRAVIS_BUILD_DIR/$SHOP_DIR/.license"
+        cp "$licenseFile" "$GITHUB_WORKSPACE/$SHOP_DIR/.license"
     fi
 
     echo "Running code sniffer..."
@@ -61,6 +72,7 @@ function checkCodeSniffRules {
     else
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}Code sniffer reports some error(s)"
+        buildResult=1
     fi
 }
 
@@ -74,6 +86,7 @@ function checkPHPStan {
     else
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}PHPStan reports some error(s)"
+        buildResult=1
     fi
 }
 
@@ -87,19 +100,29 @@ function checkDependencyViolationFinder {
     else
         echo -e "$errors"
         buildMessage="$buildMessage\n${RED}DependencyViolationFinder reports some error(s)"
+        buildResult=1
     fi
 }
 
 function checkWithLatestShop {
     echo "Checking module with latest $PRODUCT_NAME..."
 
-    if composer show | grep -q "spryker-eco/$MODULE_NAME"; then
+    foundModule=`composer show | grep "spryker-eco/$MODULE_NAME"`;
+
+    echo $foundModule;
+
+    if [ $foundModule ]; then
+      echo "composer remove spryker-eco/$MODULE_NAME";
       composer remove "spryker-eco/$MODULE_NAME"
     fi
 
-    composer config repositories.ecomodule path "$TRAVIS_BUILD_DIR/$MODULE_DIR"
-    composer update --with-all-dependencies
-    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
+    echo $GITHUB_WORKSPACE
+
+    echo "Running composer update --with-all-dependencies $composerPreference"
+    composer update --with-all-dependencies $composerPreference
+
+    echo "Running composer require "spryker-eco/$MODULE_NAME $moduleVersion" --prefer-source"
+    composer require "spryker-eco/$MODULE_NAME $moduleVersion" --prefer-source
 
     result=$?
 
@@ -117,7 +140,7 @@ function checkWithLatestShop {
 
 function checkLatestVersionOfModuleWithShop {
     echo "Merging composer.json dependencies..."
-    updates=`php "$TRAVIS_BUILD_DIR/ecoci/build/merge-composer.php" "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json" composer.json "$TRAVIS_BUILD_DIR/$MODULE_DIR/composer.json"`
+    updates=`php "$GITHUB_WORKSPACE/ecoci/build/merge-composer.php" "$GITHUB_WORKSPACE/$MODULE_DIR/composer.json" composer.json "$GITHUB_WORKSPACE/$MODULE_DIR/composer.json"`
     if [[ "$updates" = "" ]]; then
         buildMessage="${buildMessage}\n${GREEN}$MODULE_NAME is compatible with the latest version of modules used in $PRODUCT_NAME"
         return
@@ -125,7 +148,7 @@ function checkLatestVersionOfModuleWithShop {
 
     buildMessage="${buildMessage}\nUpdated dependencies in module to match $PRODUCT_NAME\n$updates"
     echo "Installing module with updated dependencies..."
-    composer require "spryker-eco/$MODULE_NAME @dev" --prefer-source
+    composer require "spryker-eco/$MODULE_NAME $moduleVersion" --prefer-source
 
     result=$?
     if [[ "$result" = 0 ]]; then
@@ -135,12 +158,6 @@ function checkLatestVersionOfModuleWithShop {
         buildMessage="${buildMessage}\n${RED}$MODULE_NAME is not compatible with the latest version of modules used in $PRODUCT_NAME"
     fi
 }
-
-updatedFile="$TRAVIS_BUILD_DIR/$SHOP_DIR/vendor/codeception/codeception/src/Codeception/Application.php"
-grep APPLICATION_ROOT_DIR "$updatedFile"
-if [[ $? = 1 ]]; then
-    echo "define('APPLICATION_ROOT_DIR', '$TRAVIS_BUILD_DIR/$SHOP_DIR');" >> "$updatedFile"
-fi
 
 cd $SHOP_DIR
 checkWithLatestShop
