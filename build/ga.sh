@@ -15,7 +15,7 @@ mkdir $MODULE_DIR
 ls -1 | grep -v ^$MODULE_DIR | grep -v ^ecoci | xargs -I{} mv {} $MODULE_DIR
 
 echo "Cloning $PRODUCT_NAME..."
-# TODO remove -b
+
 git clone -b feature/dev-te-7947-add-github-action-and-remove-travis-from-eco https://github.com/spryker-shop/$PRODUCT_NAME.git $SHOP_DIR
 cd $SHOP_DIR
 
