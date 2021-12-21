@@ -7,6 +7,9 @@ buildMessage=""
 result=0
 composerPreference=$1
 
+capitalizeCommand="echo ucfirst('$MODULE_NAME');"
+moduleNameCapitalized=$(php -r "$capitalizeCommand")
+
 if [ "$GITHUB_HEAD_REF" = "" ]; then
   moduleVersion='@dev'
 else
@@ -44,14 +47,14 @@ function runTests {
 
 function checkArchRules {
     echo "Running Architecture sniffer..."
-    errors=`vendor/bin/phpmd "vendor/spryker-eco/$MODULE_NAME/src" text vendor/spryker/architecture-sniffer/src/ruleset.xml --minimumpriority=2 | grep -v __construct`
+    errors=`vendor/bin/console code:sniff:architecture -p 2 -m SprykerEco."$moduleNameCapitalized" -v`
+    errorsPresent=$?
 
-    if [[ "$errors" = "" ]]; then
+    if [[ "$errorsPresent" = "0"  ]]; then
         buildMessage="$buildMessage\n${GREEN}Architecture sniffer reports no errors"
     else
         errorsCount=`echo "$errors" | wc -l`
         echo -e "$errors"
-        buildMessage="$buildMessage\n${RED}Architecture sniffer reports $errorsCount error(s)"
         buildResult=1
     fi
 }
@@ -78,7 +81,7 @@ function checkCodeSniffRules {
 
 function checkPHPStan {
     echo "Running PHPStan..."
-    errors=`php -d memory_limit=2048M vendor/bin/phpstan analyze -c phpstan.neon "vendor/spryker-eco/$MODULE_NAME/src" -l 2`
+    errors=`vendor/bin/console code:phpstan -m SprykerEco."$moduleNameCapitalized"`
     errorsPresent=$?
 
     if [[ "$errorsPresent" = "0" ]]; then
